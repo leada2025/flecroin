@@ -1,9 +1,10 @@
 // src/components/Header.jsx
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,6 +18,7 @@ const Header = () => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      setIsMobileMenuOpen(false); // Close mobile menu after clicking
     }
   };
 
@@ -26,6 +28,30 @@ const Header = () => {
     { name: 'FAQ', id: 'faq' },
     { name: 'Contact', id: 'contact' }
   ];
+
+  const mobileMenuVariants = {
+    closed: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    open: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    }
+  };
+
+  const menuItemVariants = {
+    closed: { opacity: 0, x: -20 },
+    open: { opacity: 1, x: 0 }
+  };
 
   return (
     <motion.header
@@ -45,7 +71,7 @@ const Header = () => {
             className="flex items-center space-x-3"
           >
             <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <img src="/Nvron.webp" alt="" />
+              <span className="text-white font-bold text-xl">F</span>
             </div>
             <div className="flex flex-col">
               <span className={`text-2xl font-bold ${isScrolled ? 'text-white' : 'text-white'}`}>
@@ -80,13 +106,65 @@ const Header = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm"
           >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <motion.div
+              animate={isMobileMenuOpen ? "open" : "closed"}
+              transition={{ duration: 0.3 }}
+            >
+              {isMobileMenuOpen ? (
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </motion.div>
           </motion.button>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              variants={mobileMenuVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
+              className="md:hidden mt-4 bg-gradient-to-b from-blue-800/90 to-gray-900/90 backdrop-blur-lg rounded-2xl border border-blue-700/30 overflow-hidden"
+            >
+              <div className="py-4 space-y-2">
+                {menuItems.map((item, index) => (
+                  <motion.button
+                    key={item.name}
+                    variants={menuItemVariants}
+                    initial="closed"
+                    animate="open"
+                    transition={{ delay: index * 0.1 }}
+                    onClick={() => scrollToSection(item.id)}
+                    className="w-full text-left px-6 py-3 text-white hover:text-cyan-300 hover:bg-white/5 transition-all duration-300 flex items-center space-x-3"
+                  >
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+                    <span className="font-medium">{item.name}</span>
+                  </motion.button>
+                ))}
+              </div>
+              
+              {/* Mobile Contact Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="border-t border-blue-700/30 pt-4 pb-2 px-6"
+              >
+               
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Bottom Border Animation */}
