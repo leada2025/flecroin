@@ -15,11 +15,23 @@ const Header = () => {
   }, []);
 
   const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMobileMenuOpen(false); // Close mobile menu after clicking
-    }
+    // Close mobile menu first
+    setIsMobileMenuOpen(false);
+    
+    // Small delay to ensure menu is closed before scrolling
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      } else {
+        console.warn(`Section with id '${sectionId}' not found`);
+        // Fallback: Scroll to top if section not found
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const menuItems = [
@@ -71,7 +83,7 @@ const Header = () => {
             className="flex items-center space-x-3"
           >
             <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl">F</span>
+             <img src="/Nvron.webp" alt="" />
             </div>
             <div className="flex flex-col">
               <span className={`text-2xl font-bold ${isScrolled ? 'text-white' : 'text-white'}`}>
@@ -152,16 +164,6 @@ const Header = () => {
                   </motion.button>
                 ))}
               </div>
-              
-              {/* Mobile Contact Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="border-t border-blue-700/30 pt-4 pb-2 px-6"
-              >
-               
-              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
